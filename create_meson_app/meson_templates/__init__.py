@@ -20,26 +20,27 @@ import gi
 import os
 import time
 from os import path
+gi.require_version("Template", '1.0')
 
 from gi.repository import (
-    Ide,
+
     Gio,
     GLib,
     GObject,
-    GtkSource,
     Template,
 )
 
-_ = Ide.gettext
+import gettext
+_ = gettext.gettext
 
-class LibraryTemplateProvider(GObject.Object, Ide.TemplateProvider):
-    def do_get_project_templates(self):
-        return [GnomeAdwaitaProjectTemplate(),
-                GnomeGTK4ProjectTemplate(),
-                GnomeProjectTemplate(),
-                LibraryProjectTemplate(),
-                CLIProjectTemplate(),
-                EmptyProjectTemplate()]
+
+def get_project_templates():
+    return [GnomeAdwaitaProjectTemplate(),
+            GnomeGTK4ProjectTemplate(),
+            GnomeProjectTemplate(),
+            LibraryProjectTemplate(),
+            CLIProjectTemplate(),
+            EmptyProjectTemplate()]
 
 class MesonTemplateLocator(Template.TemplateLocator):
     license = None
@@ -64,9 +65,9 @@ class MesonTemplateLocator(Template.TemplateLocator):
         return super().do_locate(self, path)
 
 
-class MesonTemplate(Ide.TemplateBase, Ide.ProjectTemplate):
+class MesonTemplate():
+
     def __init__(self, id, name, icon_name, description, languages, priority):
-        super().__init__()
         self.id = id
         self.name = name
         self.icon_name = icon_name
@@ -75,7 +76,7 @@ class MesonTemplate(Ide.TemplateBase, Ide.ProjectTemplate):
         self.priority = priority
         self.locator = MesonTemplateLocator()
 
-        self.props.locator = self.locator
+        self.locator
 
     def do_get_id(self):
         return self.id
@@ -98,7 +99,6 @@ class MesonTemplate(Ide.TemplateBase, Ide.ProjectTemplate):
     def do_expand_async(self, params, cancellable, callback, data):
         self.reset()
 
-        task = Ide.Task.new(self, cancellable, callback)
 
         if 'language' in params:
             self.language = params['language'].get_string().lower()
